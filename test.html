@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+	<head>
+		<script src="http://simplewebrtc.com/latest.js"></script>
+		<style>
+			// #remoteVideos video {
+			// 	height: 300px;
+			// }
+
+			#localVideo {
+				height: 300px;
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<video id="localVideo"></video>
+		<div id="remoteVideos"></div>
+		<script>
+			var webrtc = new SimpleWebRTC({
+				localVideoEl: 'localVideo',
+				// remoteVideosEl: 'remoteVideos',
+				remoteVideosEl: 'dinosaurs',
+				autoRequestMedia: true
+			});
+
+			webrtc.on('readyToCall', function () {
+				webrtc.joinRoom('cats');
+			});
+
+			webrtc.on('videoAdded', function (video, peer) {
+				console.log('video added', peer);
+				var remotes = document.getElementById('remoteVideos');
+				if (remotes) {
+					var container = document.createElement('div');
+					container.className = 'videoContainer';
+					container.id = 'container_' + webrtc.getDomId(peer);
+					container.appendChild(video);
+
+					video.oncontextmenu = function () { return false; };
+
+					remotes.appendChild(container);
+				}
+			});
+
+			webrtc.on('videoRemoved', function (video, peer) {
+				console.log('video remoed ', peer);
+				var remotes = document.getElementById('remoteVideos');
+				var e1 = document.getElementById(peer ? 'container_' + webrtc.getDomId(peer) : 'localScreenContainer');
+				if (remotes && e1) {
+					remotes.removeChild(e1);
+				}
+			});
+		</script>
+	</body>
+</html>
+
